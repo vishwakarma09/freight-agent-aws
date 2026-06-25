@@ -18,3 +18,7 @@ yarn-error.log*
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Local logs
+uvicorn.log
+

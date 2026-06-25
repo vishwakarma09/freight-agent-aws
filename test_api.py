@@ -63,18 +63,18 @@ def test_root():
     global failed_tests
     print("Test 1: GET / (Root Healthcheck)")
     code, data = make_request(f"{api_url}/")
-    if code == 200 and data.get("status") == "online":
-        print("  ✅ PASS: Root status is online.")
+    if code == 200 and data.get("status") in ("online", "running"):
+        print("  ✅ PASS: Root status is online/running.")
     else:
-        print(f"  ❌ FAIL: Expected 200/online, got Status={code}, Response={data}")
+        print(f"  ❌ FAIL: Expected 200/online/running, got Status={code}, Response={data}")
         failed_tests += 1
 
 def test_quotes_crud():
     global failed_tests
     print("\nTest 2: POST /api/quotes (Create Quote)")
-    headers = {"X-User-Email": "developer@freightcorp.com"}
+    headers = {"X-User-Email": "broker@dispatch.owera.ca"}
     quote_payload = {
-        "customer_id": 999,
+        "customer_id": 1,
         "origin": "Chicago, IL",
         "destination": "Houston, TX",
         "weight_lbs": 42000.0,

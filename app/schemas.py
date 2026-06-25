@@ -1,0 +1,236 @@
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from datetime import datetime
+
+class CustomerBase(BaseModel):
+    name: str
+    email: str
+    default_markup_percent: float = 10.0
+
+class CustomerCreate(CustomerBase):
+    pass
+
+class CustomerResponse(CustomerBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class CarrierBase(BaseModel):
+    name: str
+    email: str
+    competitiveness_score: float = 0.0
+    is_override: bool = False
+    simulated_score: float = 0.0
+
+class CarrierCreate(CarrierBase):
+    pass
+
+class CarrierResponse(CarrierBase):
+    id: int
+    calculated_competitiveness_score: float = 0.0
+
+    class Config:
+        from_attributes = True
+
+
+class FreightQuoteCreate(BaseModel):
+    customer_id: int
+    origin: str
+    destination: str
+    weight_lbs: float
+    dimensions: Optional[str] = "48x48x48"
+    freight_class: Optional[str] = "70"
+    hazmat: Optional[bool] = False
+    accessorials: Optional[str] = ""
+    pickup_date: datetime
+
+
+class CarrierBidBase(BaseModel):
+    carrier_id: int
+    round: int = 1
+    bid_amount: float
+    transit_time_days: int
+    pickup_window: Optional[str] = "09:00 - 17:00"
+    accessorials_text: Optional[str] = ""
+    service_level: Optional[str] = "Standard LTL"
+    notes: Optional[str] = ""
+
+class CarrierBidCreate(CarrierBidBase):
+    pass
+
+class CarrierBidResponse(CarrierBidBase):
+    id: int
+    freight_quote_id: str
+    received_at: datetime
+    is_winning: bool
+
+    class Config:
+        from_attributes = True
+
+
+class StateTransitionResponse(BaseModel):
+    id: int
+    from_status: str
+    to_status: str
+    timestamp: datetime
+    notes: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class RequestForQuoteResponse(BaseModel):
+    id: int
+    freight_quote_id: str
+    carrier_id: int
+    supplier_id: int
+    status: str
+    sent_at: datetime
+    subject: Optional[str] = None
+    body: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class FreightQuoteResponse(BaseModel):
+    id: str
+    customer_id: int
+    customer: CustomerResponse
+    status: str
+    origin: str
+    destination: str
+    weight_lbs: float
+    dimensions: Optional[str]
+    freight_class: Optional[str]
+    hazmat: bool
+    accessorials: Optional[str]
+    pickup_date: datetime
+    first_round_ends_at: Optional[datetime]
+    rebid_round_ends_at: Optional[datetime]
+    quote_expires_at: Optional[datetime]
+    cost_price: float
+    sell_price: float
+    markup_percent: float
+    margin_amt: float
+    margin_pct: float
+    winning_carrier_id: Optional[int]
+    winning_carrier: Optional[CarrierResponse]
+    lost_reason: Optional[str]
+    competitor_info: Optional[str]
+    payment_status: str
+    bol_url: Optional[str]
+    invoice_url: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    bids: List[CarrierBidResponse] = []
+    transitions: List[StateTransitionResponse] = []
+    rfqs: List[RequestForQuoteResponse] = []
+
+    class Config:
+        from_attributes = True
+
+
+class QuoteApprovalRequest(BaseModel):
+    approved: bool
+    lost_reason: Optional[str] = None
+    competitor_info: Optional[str] = None
+
+
+class SimulateEmailRequest(BaseModel):
+    sender: str
+    recipient: str
+    subject: str
+    body: str
+
+
+class ConnectorBase(BaseModel):
+    name: str
+    company_name: Optional[str] = None
+    contact_email: str
+    contact_phone: Optional[str] = None
+    contact_name: Optional[str] = None
+    contact_role: Optional[str] = None
+    channel: str = "email"
+    filtering_keywords: Optional[str] = None
+    status: str = "CONNECTED"
+
+
+class ConnectorCreate(ConnectorBase):
+    pass
+
+
+class ConnectorResponse(ConnectorBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class EmailCredentialCreate(BaseModel):
+    email_provider: str = "Gmail"
+    email: str
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_password: str
+    imap_host: str = "imap.gmail.com"
+    imap_port: int = 993
+    imap_password: str
+    use_dev_mode: bool = False
+
+
+class EmailCredentialResponse(BaseModel):
+    id: int
+    email_provider: str
+    email: str
+    smtp_host: str
+    smtp_port: int
+    imap_host: str
+    imap_port: int
+    use_dev_mode: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserRegister(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserTokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
+
+class PresignedUrlResponse(BaseModel):
+    upload_url: str
+    file_key: str
+    asset_url: str
+
+
+

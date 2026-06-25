@@ -7,9 +7,16 @@ provider:
   region: ${opt:region, 'us-east-2'}
   environment:
     S3_BUCKET_NAME: "dispatch-private"
-    DYNAMODB_TABLE: "${self:service}-${sls:stage}-data"
+    DATABASE_URL: ${env:DATABASE_URL, 'postgresql://freight_user:freight_password@localhost:5432/freight_bidding_db'}
+    CEREBRAS_API_KEY: ${env:CEREBRAS_API_KEY, 'csk-xxxxxxxxxxxxxxxxxxxxxxxx'}
+    REDIS_HOST: ${env:REDIS_HOST, 'localhost'}
+    REDIS_PORT: ${env:REDIS_PORT, '6379'}
+    SMTP_HOST: ${env:SMTP_HOST, 'localhost'}
+    SMTP_PORT: ${env:SMTP_PORT, '1025'}
+    GOOGLE_CLIENT_ID: ${env:GOOGLE_CLIENT_ID, 'xxxxxxxxxxxxxxxxxxxxxxxxx'}
+    GOOGLE_CLIENT_SECRET: ${env:GOOGLE_CLIENT_SECRET, 'GOCSPX-xxxxxxxxxxxxxxxxxxxxxxxx'}
   
-  # Grant Lambda permissions to access the existing S3 bucket and the new DynamoDB table
+  # Grant Lambda permissions to access the S3 bucket
   iam:
     role:
       statements:
@@ -22,24 +29,13 @@ provider:
           Resource:
             - arn:aws:s3:::dispatch-private
             - arn:aws:s3:::dispatch-private/*
-        - Effect: Allow
-          Action:
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource:
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${self:service}-${sls:stage}-data
-            - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${self:service}-${sls:stage}-data/index/*
 
 plugins:
   - serverless-python-requirements
 
 custom:
   pythonRequirements:
-    dockerizePip: false
+    dockerizePip: 'non-linux'
     noDeploy:
       - boto3
       - botocore
@@ -54,21 +50,7 @@ functions:
       - httpApi:
           path: /{proxy+}
           method: ANY
-
-resources:
-  Resources:
-    DataTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: "${self:service}-${sls:stage}-data"
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: PK
-            AttributeType: S
-          - AttributeName: SK
-            AttributeType: S
-        KeySchema:
-          - AttributeName: PK
-            KeyType: HASH
-          - AttributeName: SK
-            KeyType: RANGE
+  cron:
+    handler: app.main.cron_handler
+    events:
+      - schedule: rate(1 minute)
