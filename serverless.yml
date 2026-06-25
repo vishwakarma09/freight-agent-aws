@@ -1,4 +1,5 @@
 service: freight-agent-api
+useDotenv: true
 
 provider:
   name: aws
