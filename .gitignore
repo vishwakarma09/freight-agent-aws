@@ -22,3 +22,7 @@ Thumbs.db
 # Local logs
 uvicorn.log
 
+# Frontend Environment Variables
+frontend/.env
+frontend/.env.production
+

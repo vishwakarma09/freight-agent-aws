@@ -69,25 +69,48 @@ The runtime Lambda function itself needs to be allowed to interact with S3 and C
 
 ## Running Locally
 
-To run the FastAPI server locally for development:
+### 1. Run the FastAPI server:
 ```bash
 source venv/bin/activate
 uvicorn app.main:app --reload
 ```
-
 Once running, view the interactive API documentation at:
 * Swagger UI: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 * Redoc: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+### 2. Run the React frontend:
+```bash
+cd frontend
+npm install --legacy-peer-deps
+npm run dev
+```
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
 ## Deployment
 
-Deploy the API to AWS Lambda:
+### 1. Deploy the API to AWS Lambda:
 ```bash
 npx serverless deploy
 ```
 *Note: This project uses **Serverless Framework v3** to allow deployments locally without requiring a login or paid subscription.*
+
+### 2. Deploy the Frontend to S3:
+To build and deploy the frontend static website to S3, run:
+```bash
+./deploy_frontend.sh [stage]
+```
+For example, to deploy to the default `dev` stage:
+```bash
+./deploy_frontend.sh dev
+```
+This script will:
+1. Retrieve your AWS Account ID to resolve the bucket name (`freight-agent-frontend-<stage>-<account_id>`).
+2. Install frontend dependencies.
+3. Build the frontend static files using Vite, injecting the backend `API_URL` dynamically.
+4. Upload/sync the built files to the S3 bucket.
+5. Print the public HTTP URL of your deployed frontend.
 
 ### Clean Up (Teardown)
 To remove the deployed stack and delete the associated AWS resources (excluding the persistent S3 data bucket):

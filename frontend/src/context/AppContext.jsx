@@ -1,0 +1,300 @@
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import * as api from '../services/api'
+
+const AppContext = createContext()
+
+export const AppProvider = ({ children }) => {
+  const [quotes, setQuotes] = useState([])
+  const [carriers, setCarriers] = useState([])
+  const [customers, setCustomers] = useState([])
+  const [editingCarrierId, setEditingCarrierId] = useState(null)
+  const [analytics, setAnalytics] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [activeQuote, setActiveQuote] = useState(null)
+  const [historicalRag, setHistoricalRag] = useState([])
+  const [selectedTab, setSelectedTab] = useState('landing')
+  const [notifications, setNotifications] = useState([])
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const savedEmail = localStorage.getItem('userEmail')
+    if (savedEmail) {
+      if (api.default && api.default.defaults) {
+        api.default.defaults.headers.common['X-User-Email'] = savedEmail
+      }
+      return true
+    }
+    return false
+  })
+  const [user, setUser] = useState(() => {
+    const savedEmail = localStorage.getItem('userEmail')
+    return savedEmail ? { email: savedEmail, name: savedEmail.split('@')[0] } : null
+  })
+
+  const addNotification = (message, type = 'success') => {
+    const id = Date.now()
+    setNotifications(prev => [...prev, { id, message, type }])
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id))
+    }, 4000)
+  }
+
+  const fetchData = async (showLoading = false) => {
+    if (showLoading) setLoading(true)
+    try {
+      const [qData, cData, custData, aData] = await Promise.all([
+        api.getQuotes(),
+        api.getCarriers(),
+        api.getCustomers(),
+        api.getAnalytics()
+      ])
+      setQuotes(qData)
+      setCarriers(cData)
+      setCustomers(custData)
+      setAnalytics(aData)
+    } catch (err) {
+      console.error("Failed to load application data:", err)
+      addNotification("Error loading data from server", "error")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const publicTabs = ['landing', 'pricing', 'login', 'register']
+    const isPublicPage = publicTabs.includes(selectedTab)
+
+    if (!isAuthenticated || isPublicPage) {
+      return
+    }
+
+    fetchData(true)
+    // Set up auto-refresh polling every 5 seconds to show state machine progress
+    const interval = setInterval(() => {
+      fetchData(false)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [isAuthenticated, selectedTab])
+
+  const selectQuote = async (id) => {
+    if (!id) {
+      setActiveQuote(null)
+      setHistoricalRag([])
+      return
+    }
+    try {
+      const [detailedQuote, ragData] = await Promise.all([
+        api.getQuote(id),
+        api.getHistoricalRag(id)
+      ])
+      setActiveQuote(detailedQuote)
+      setHistoricalRag(ragData)
+    } catch (err) {
+      console.error("Failed to fetch detailed quote info:", err)
+      addNotification("Failed to load quote details", "error")
+    }
+  }
+
+  const handleManualOverride = async (quoteId, toStatus, notes) => {
+    try {
+      await api.manualOverride(quoteId, toStatus, notes)
+      addNotification(`Quote ${quoteId} overridden to stage: ${toStatus}`)
+      fetchData()
+      if (activeQuote && activeQuote.id === quoteId) {
+        selectQuote(quoteId)
+      }
+    } catch (err) {
+      console.error("Manual override failed:", err)
+      addNotification("Failed to apply manual override", "error")
+    }
+  }
+
+  const handleApproval = async (quoteId, approved, lostReason = "", competitorInfo = "") => {
+    try {
+      await api.approveQuote(quoteId, { approved, lost_reason: lostReason, competitor_info: competitorInfo })
+      addNotification(approved ? `Quote ${quoteId} APPROVED & booked!` : `Quote ${quoteId} marked as LOST`)
+      fetchData()
+      if (activeQuote && activeQuote.id === quoteId) {
+        selectQuote(quoteId)
+      }
+    } catch (err) {
+      console.error("Quote resolution action failed:", err)
+      addNotification("Resolution action failed", "error")
+    }
+  }
+
+  const handleSendMockEmail = async (sender, recipient, subject, body) => {
+    try {
+      const response = await api.sendMockEmail({ sender, recipient, subject, body })
+      if (response.type === "CUSTOMER_INQUIRY") {
+        addNotification(`Mock inquiry ingested! Quote ${response.quote_id} created.`)
+      } else if (response.type === "CARRIER_BID") {
+        addNotification(`Mock bid received! Carrier ${response.carrier} bid $${response.bid_amount}.`)
+      }
+      fetchData()
+      return response
+    } catch (err) {
+      console.error("Mock email ingestion failed:", err)
+      addNotification("Email simulator error: check email fields", "error")
+      throw err
+    }
+  }
+
+  const handleFastForwardTimers = async () => {
+    try {
+      const response = await api.fastForwardTimers()
+      addNotification(response.message || "Timers fast-forwarded successfully!")
+      fetchData()
+      return response
+    } catch (err) {
+      console.error("Fast-forward timers failed:", err)
+      addNotification("Failed to fast-forward timers", "error")
+      throw err
+    }
+  }
+
+  const handleResetDatabase = async () => {
+    try {
+      const response = await api.resetSimulatorDatabase()
+      addNotification(response.message || "Database reset successfully!")
+      fetchData()
+      return response
+    } catch (err) {
+      console.error("Database reset failed:", err)
+      addNotification("Failed to reset database", "error")
+      throw err
+    }
+  }
+
+
+  const login = async (email, password) => {
+    try {
+      const response = await api.login({ email, password })
+      const { user } = response
+      localStorage.setItem('userEmail', user.email)
+      setIsAuthenticated(true)
+      setUser(user)
+      if (api.default && api.default.defaults) {
+        api.default.defaults.headers.common['X-User-Email'] = user.email
+      }
+      addNotification("Logged in successfully! Welcome back.", "success")
+      setSelectedTab('dashboard')
+    } catch (err) {
+      console.error("Login failed:", err)
+      const errorMsg = err.response?.data?.detail || "Invalid email or password"
+      addNotification(errorMsg, "error")
+      throw err
+    }
+  }
+
+  const register = async (name, email, password) => {
+    try {
+      const response = await api.register({ name, email, password })
+      addNotification(response.message || "Registration successful! Please check your email to activate.", "success")
+      return response
+    } catch (err) {
+      console.error("Registration failed:", err)
+      const errorMsg = err.response?.data?.detail || "Registration failed"
+      addNotification(errorMsg, "error")
+      throw err
+    }
+  }
+
+  const loginWithGoogle = async (credentialToken) => {
+    try {
+      const response = await api.googleSSO({ credential: credentialToken })
+      const { user } = response
+      localStorage.setItem('userEmail', user.email)
+      setIsAuthenticated(true)
+      setUser(user)
+      if (api.default && api.default.defaults) {
+        api.default.defaults.headers.common['X-User-Email'] = user.email
+      }
+      addNotification("Logged in with Google successfully!", "success")
+      setSelectedTab('dashboard')
+    } catch (err) {
+      console.error("Google login failed:", err)
+      addNotification("Google Sign-In failed", "error")
+      throw err
+    }
+  }
+
+  const logout = () => {
+    localStorage.removeItem('userEmail')
+    setIsAuthenticated(false)
+    setUser(null)
+    if (api.default && api.default.defaults && api.default.defaults.headers.common['X-User-Email']) {
+      delete api.default.defaults.headers.common['X-User-Email']
+    }
+    addNotification("Logged out successfully.", "success")
+    setSelectedTab('landing')
+  }
+
+
+  const handleSaveCarrier = async (payload) => {
+    try {
+      if (editingCarrierId) {
+        await api.updateCarrier(editingCarrierId, payload)
+        addNotification("Carrier updated successfully!", "success")
+      } else {
+        await api.createCarrier(payload)
+        addNotification("New carrier added successfully!", "success")
+      }
+      setEditingCarrierId(null)
+      fetchData()
+      setSelectedTab('connectors_list')
+    } catch (err) {
+      console.error("Failed to save carrier:", err)
+      const errorMsg = err.response?.data?.detail || "Failed to save carrier"
+      addNotification(errorMsg, "error")
+    }
+  }
+
+  const handleDeleteCarrier = async (id) => {
+    try {
+      await api.deleteCarrier(id)
+      addNotification("Carrier deleted successfully!", "success")
+      fetchData()
+    } catch (err) {
+      console.error("Failed to delete carrier:", err)
+      addNotification("Failed to delete carrier", "error")
+    }
+  }
+
+  return (
+    <AppContext.Provider value={{
+      quotes,
+      carriers,
+      customers,
+      editingCarrierId,
+      setEditingCarrierId,
+      analytics,
+      loading,
+      activeQuote,
+      historicalRag,
+      selectedTab,
+      setSelectedTab,
+      notifications,
+      addNotification,
+      fetchData,
+      selectQuote,
+      handleManualOverride,
+      handleApproval,
+      handleSendMockEmail,
+      handleFastForwardTimers,
+      handleResetDatabase,
+      isAuthenticated,
+
+      user,
+      login,
+      register,
+      loginWithGoogle,
+      logout,
+      handleSaveCarrier,
+      handleDeleteCarrier
+
+    }}>
+      {children}
+    </AppContext.Provider>
+  )
+}
+
+export const useApp = () => useContext(AppContext)
