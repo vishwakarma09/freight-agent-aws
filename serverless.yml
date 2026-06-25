@@ -30,12 +30,27 @@ provider:
             - arn:aws:s3:::dispatch-private
             - arn:aws:s3:::dispatch-private/*
 
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!venv/**'
+    - '!.venv/**'
+    - '!.git/**'
+    - '!package-lock.json'
+    - '!package.json'
+    - '!docs/**'
+    - '!uvicorn.log'
+    - '!test_api.py'
+
 plugins:
   - serverless-python-requirements
+
 
 custom:
   pythonRequirements:
     dockerizePip: 'non-linux'
+    slim: true
+    strip: true
     noDeploy:
       - boto3
       - botocore
