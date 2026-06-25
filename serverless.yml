@@ -69,7 +69,7 @@ functions:
   cron:
     handler: app.main.cron_handler
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(10 minutes)
 
 resources:
   Resources:

@@ -27,7 +27,7 @@ graph TD
         end
 
         subgraph EventBridge ["Scheduling"]
-            CronRule["EventBridge Rule - rate 1 minute"]
+            CronRule["EventBridge Rule - rate 10 minutes"]
         end
 
         subgraph Storage ["Storage and Database"]
@@ -47,7 +47,7 @@ graph TD
     Browser -->|API Requests| HttpApi
     HttpApi -->|Invokes| ApiLambda
 
-    CronRule -->|Triggers Every Minute| CronLambda
+    CronRule -->|Triggers Every 10 Minutes| CronLambda
 
     %% Lambda Operations
     ApiLambda -->|SQL Queries and pgvector RAG| Postgres

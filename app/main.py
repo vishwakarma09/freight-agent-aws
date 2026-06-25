@@ -189,7 +189,7 @@ handler = Mangum(app)
 # AWS Lambda Handler for EventBridge Scheduled Cron Trigger
 def cron_handler(event, context):
     """
-    Triggered periodically (e.g. every minute) by EventBridge to perform:
+    Triggered periodically (e.g. every 10 minutes) by EventBridge to perform:
     1. Workflow timer check (Check active rounds and progress states)
     2. Email ingestion (Inbox polling for new carrier bids / customer requests)
     """
