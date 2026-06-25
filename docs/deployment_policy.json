@@ -1,0 +1,111 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudFormationManagement",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:*"
+      ],
+      "Resource": [
+        "arn:aws:cloudformation:*:*:stack/freight-agent-api-*/*",
+        "arn:aws:cloudformation:*:*:stack/freight-agent-api-*"
+      ]
+    },
+    {
+      "Sid": "CloudFormationGlobalOps",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:ListStacks",
+        "cloudformation:ValidateTemplate"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "LambdaManagement",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:DeleteFunction",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:AddPermission",
+        "lambda:RemovePermission",
+        "lambda:PublishVersion",
+        "lambda:ListVersionsByFunction",
+        "lambda:TagResource",
+        "lambda:UntagResource"
+      ],
+      "Resource": "arn:aws:lambda:*:*:function:*"
+    },
+    {
+      "Sid": "APIGatewayManagement",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:*"
+      ],
+      "Resource": "arn:aws:apigateway:*::/*"
+    },
+    {
+      "Sid": "S3BucketAndObjectManagement",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::*/*"
+      ]
+    },
+    {
+      "Sid": "DynamoDBManagement",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:*:*:table/freight-agent-api-*"
+      ]
+    },
+    {
+      "Sid": "IAMRoleManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:GetRole",
+        "iam:PassRole",
+        "iam:PutRolePolicy",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::*:role/*"
+      ]
+    },
+    {
+      "Sid": "CloudWatchLogsManagement",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DeleteLogGroup",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteRetentionPolicy",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:TagResource",
+        "logs:UntagResource",
+        "logs:FilterLogEvents",
+        "logs:GetLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

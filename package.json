@@ -1,0 +1,13 @@
+{
+  "name": "freight-agent-aws",
+  "version": "1.0.0",
+  "description": "Freight bidding workflow orchestrator backend on AWS Lambda and API Gateway",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "serverless": "^3.40.0",
+    "serverless-python-requirements": "^6.0.0"
+  }
+}

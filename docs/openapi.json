@@ -1,0 +1,2329 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Freight bidding workflow orchestrator",
+        "description": "Automated competitive freight bidding API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/quotes": {
+            "get": {
+                "tags": [
+                    "Freight Quotes"
+                ],
+                "summary": "Get Quotes",
+                "operationId": "get_quotes_api_quotes_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/FreightQuoteResponse"
+                                    },
+                                    "title": "Response Get Quotes Api Quotes Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Freight Quotes"
+                ],
+                "summary": "Create Quote",
+                "operationId": "create_quote_api_quotes_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FreightQuoteCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FreightQuoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/quotes/{quote_id}": {
+            "get": {
+                "tags": [
+                    "Freight Quotes"
+                ],
+                "summary": "Get Quote",
+                "operationId": "get_quote_api_quotes__quote_id__get",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Quote Id"
+                        }
+                    },
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FreightQuoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/quotes/{quote_id}/approve": {
+            "post": {
+                "tags": [
+                    "Freight Quotes"
+                ],
+                "summary": "Approve Quote",
+                "operationId": "approve_quote_api_quotes__quote_id__approve_post",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Quote Id"
+                        }
+                    },
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QuoteApprovalRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FreightQuoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/quotes/{quote_id}/manual-override": {
+            "post": {
+                "tags": [
+                    "Freight Quotes"
+                ],
+                "summary": "Manual Override",
+                "description": "Beta requirement: allows manual override of pipeline stage at any time.",
+                "operationId": "manual_override_api_quotes__quote_id__manual_override_post",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Quote Id"
+                        }
+                    },
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_manual_override_api_quotes__quote_id__manual_override_post"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FreightQuoteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/quotes/{quote_id}/historical-rag": {
+            "get": {
+                "tags": [
+                    "Freight Quotes"
+                ],
+                "summary": "Get Historical Rag",
+                "description": "Performs a vector similarity search on the pgvector column to find \nthe top 3 closest historical lanes and their pricing.",
+                "operationId": "get_historical_rag_api_quotes__quote_id__historical_rag_get",
+                "parameters": [
+                    {
+                        "name": "quote_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Quote Id"
+                        }
+                    },
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/carriers": {
+            "get": {
+                "tags": [
+                    "Carriers"
+                ],
+                "summary": "Get Carriers",
+                "operationId": "get_carriers_api_carriers_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CarrierResponse"
+                                    },
+                                    "title": "Response Get Carriers Api Carriers Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Carriers"
+                ],
+                "summary": "Create Carrier",
+                "operationId": "create_carrier_api_carriers_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarrierCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CarrierResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/carriers/{carrier_id}": {
+            "put": {
+                "tags": [
+                    "Carriers"
+                ],
+                "summary": "Update Carrier",
+                "operationId": "update_carrier_api_carriers__carrier_id__put",
+                "parameters": [
+                    {
+                        "name": "carrier_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Carrier Id"
+                        }
+                    },
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CarrierCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CarrierResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Carriers"
+                ],
+                "summary": "Delete Carrier",
+                "operationId": "delete_carrier_api_carriers__carrier_id__delete",
+                "parameters": [
+                    {
+                        "name": "carrier_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "title": "Carrier Id"
+                        }
+                    },
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customers": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Get Customers",
+                "operationId": "get_customers_api_customers_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CustomerResponse"
+                                    },
+                                    "title": "Response Get Customers Api Customers Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Customers"
+                ],
+                "summary": "Create Customer",
+                "operationId": "create_customer_api_customers_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/simulator/send-mock-email": {
+            "post": {
+                "tags": [
+                    "Email Simulator"
+                ],
+                "summary": "Send Mock Email",
+                "description": "Simulates receiving an email (either a customer inquiry, a carrier bid, or a customer approval/rejection).",
+                "operationId": "send_mock_email_api_simulator_send_mock_email_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SimulateEmailRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/simulator/fast-forward": {
+            "post": {
+                "tags": [
+                    "Email Simulator"
+                ],
+                "summary": "Fast Forward Timers",
+                "description": "Fast-forwards all active bidding and quote timers to progress the workflow.",
+                "operationId": "fast_forward_timers_api_simulator_fast_forward_post",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/simulator/reset-database": {
+            "post": {
+                "tags": [
+                    "Email Simulator"
+                ],
+                "summary": "Reset Database",
+                "description": "Clears all quote-related tables to reset the simulator state.",
+                "operationId": "reset_database_api_simulator_reset_database_post",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/simulator/logs": {
+            "get": {
+                "tags": [
+                    "Email Simulator"
+                ],
+                "summary": "Get Logs",
+                "description": "Returns a combined list of logs based on actual state transitions and carrier bids.",
+                "operationId": "get_logs_api_simulator_logs_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 50,
+                            "title": "Limit"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/simulator/mailpit-messages": {
+            "get": {
+                "tags": [
+                    "Email Simulator"
+                ],
+                "summary": "Get Mailpit Messages",
+                "description": "Proxies requests to the Mailpit API to fetch mock emails.\nTry multiple potential endpoints:\n1. mailpit:8025 (inside docker container network)\n2. localhost:18025 (fallback if mapped to 18025 on host)\n3. localhost:8025 (fallback if running directly on host or host network)\n4. host.docker.internal:18025 (docker-to-host fallback)",
+                "operationId": "get_mailpit_messages_api_simulator_mailpit_messages_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/analytics": {
+            "get": {
+                "tags": [
+                    "Analytics"
+                ],
+                "summary": "Get Analytics",
+                "description": "Computes key performance metrics for the freight pipeline.",
+                "operationId": "get_analytics_api_analytics_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/email-credentials": {
+            "get": {
+                "tags": [
+                    "Email Credentials"
+                ],
+                "summary": "Get Credentials",
+                "operationId": "get_credentials_api_email_credentials_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/EmailCredentialResponse"
+                                    },
+                                    "title": "Response Get Credentials Api Email Credentials Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Email Credentials"
+                ],
+                "summary": "Save Credentials",
+                "operationId": "save_credentials_api_email_credentials_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmailCredentialCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EmailCredentialResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Email Credentials"
+                ],
+                "summary": "Delete Credentials",
+                "operationId": "delete_credentials_api_email_credentials_delete",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/email-credentials/env": {
+            "get": {
+                "tags": [
+                    "Email Credentials"
+                ],
+                "summary": "Get Env Mode",
+                "operationId": "get_env_mode_api_email_credentials_env_get",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/email-credentials/test": {
+            "post": {
+                "tags": [
+                    "Email Credentials"
+                ],
+                "summary": "Test Credentials",
+                "operationId": "test_credentials_api_email_credentials_test_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EmailCredentialCreate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/email-credentials/test-existing": {
+            "post": {
+                "tags": [
+                    "Email Credentials"
+                ],
+                "summary": "Test Existing Credentials",
+                "operationId": "test_existing_credentials_api_email_credentials_test_existing_post",
+                "parameters": [
+                    {
+                        "name": "X-User-Email",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "X-User-Email"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register User",
+                "operationId": "register_user_api_auth_register_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserRegister"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/activate": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Activate Account",
+                "operationId": "activate_account_api_auth_activate_get",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login User",
+                "operationId": "login_user_api_auth_login_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserLogin"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserTokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/google-sso": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Google Sso",
+                "operationId": "google_sso_api_auth_google_sso_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GoogleSSORequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "summary": "Read Root",
+                "operationId": "read_root__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Body_manual_override_api_quotes__quote_id__manual_override_post": {
+                "properties": {
+                    "to_status": {
+                        "type": "string",
+                        "title": "To Status"
+                    },
+                    "notes": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Notes"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "to_status"
+                ],
+                "title": "Body_manual_override_api_quotes__quote_id__manual_override_post"
+            },
+            "CarrierBidResponse": {
+                "properties": {
+                    "carrier_id": {
+                        "type": "integer",
+                        "title": "Carrier Id"
+                    },
+                    "round": {
+                        "type": "integer",
+                        "title": "Round",
+                        "default": 1
+                    },
+                    "bid_amount": {
+                        "type": "number",
+                        "title": "Bid Amount"
+                    },
+                    "transit_time_days": {
+                        "type": "integer",
+                        "title": "Transit Time Days"
+                    },
+                    "pickup_window": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Pickup Window",
+                        "default": "09:00 - 17:00"
+                    },
+                    "accessorials_text": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Accessorials Text",
+                        "default": ""
+                    },
+                    "service_level": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Service Level",
+                        "default": "Standard LTL"
+                    },
+                    "notes": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Notes",
+                        "default": ""
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "freight_quote_id": {
+                        "type": "string",
+                        "title": "Freight Quote Id"
+                    },
+                    "received_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Received At"
+                    },
+                    "is_winning": {
+                        "type": "boolean",
+                        "title": "Is Winning"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "carrier_id",
+                    "bid_amount",
+                    "transit_time_days",
+                    "id",
+                    "freight_quote_id",
+                    "received_at",
+                    "is_winning"
+                ],
+                "title": "CarrierBidResponse"
+            },
+            "CarrierCreate": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "competitiveness_score": {
+                        "type": "number",
+                        "title": "Competitiveness Score",
+                        "default": 0.0
+                    },
+                    "is_override": {
+                        "type": "boolean",
+                        "title": "Is Override",
+                        "default": false
+                    },
+                    "simulated_score": {
+                        "type": "number",
+                        "title": "Simulated Score",
+                        "default": 0.0
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "email"
+                ],
+                "title": "CarrierCreate"
+            },
+            "CarrierResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "competitiveness_score": {
+                        "type": "number",
+                        "title": "Competitiveness Score",
+                        "default": 0.0
+                    },
+                    "is_override": {
+                        "type": "boolean",
+                        "title": "Is Override",
+                        "default": false
+                    },
+                    "simulated_score": {
+                        "type": "number",
+                        "title": "Simulated Score",
+                        "default": 0.0
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "calculated_competitiveness_score": {
+                        "type": "number",
+                        "title": "Calculated Competitiveness Score",
+                        "default": 0.0
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "email",
+                    "id"
+                ],
+                "title": "CarrierResponse"
+            },
+            "CustomerCreate": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "default_markup_percent": {
+                        "type": "number",
+                        "title": "Default Markup Percent",
+                        "default": 10.0
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "email"
+                ],
+                "title": "CustomerCreate"
+            },
+            "CustomerResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "default_markup_percent": {
+                        "type": "number",
+                        "title": "Default Markup Percent",
+                        "default": 10.0
+                    },
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "email",
+                    "id",
+                    "created_at"
+                ],
+                "title": "CustomerResponse"
+            },
+            "EmailCredentialCreate": {
+                "properties": {
+                    "email_provider": {
+                        "type": "string",
+                        "title": "Email Provider",
+                        "default": "Gmail"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "smtp_host": {
+                        "type": "string",
+                        "title": "Smtp Host",
+                        "default": "smtp.gmail.com"
+                    },
+                    "smtp_port": {
+                        "type": "integer",
+                        "title": "Smtp Port",
+                        "default": 587
+                    },
+                    "smtp_password": {
+                        "type": "string",
+                        "title": "Smtp Password"
+                    },
+                    "imap_host": {
+                        "type": "string",
+                        "title": "Imap Host",
+                        "default": "imap.gmail.com"
+                    },
+                    "imap_port": {
+                        "type": "integer",
+                        "title": "Imap Port",
+                        "default": 993
+                    },
+                    "imap_password": {
+                        "type": "string",
+                        "title": "Imap Password"
+                    },
+                    "use_dev_mode": {
+                        "type": "boolean",
+                        "title": "Use Dev Mode",
+                        "default": false
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "email",
+                    "smtp_password",
+                    "imap_password"
+                ],
+                "title": "EmailCredentialCreate"
+            },
+            "EmailCredentialResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "email_provider": {
+                        "type": "string",
+                        "title": "Email Provider"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "smtp_host": {
+                        "type": "string",
+                        "title": "Smtp Host"
+                    },
+                    "smtp_port": {
+                        "type": "integer",
+                        "title": "Smtp Port"
+                    },
+                    "imap_host": {
+                        "type": "string",
+                        "title": "Imap Host"
+                    },
+                    "imap_port": {
+                        "type": "integer",
+                        "title": "Imap Port"
+                    },
+                    "use_dev_mode": {
+                        "type": "boolean",
+                        "title": "Use Dev Mode"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "email_provider",
+                    "email",
+                    "smtp_host",
+                    "smtp_port",
+                    "imap_host",
+                    "imap_port",
+                    "use_dev_mode",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "EmailCredentialResponse"
+            },
+            "FreightQuoteCreate": {
+                "properties": {
+                    "customer_id": {
+                        "type": "integer",
+                        "title": "Customer Id"
+                    },
+                    "origin": {
+                        "type": "string",
+                        "title": "Origin"
+                    },
+                    "destination": {
+                        "type": "string",
+                        "title": "Destination"
+                    },
+                    "weight_lbs": {
+                        "type": "number",
+                        "title": "Weight Lbs"
+                    },
+                    "dimensions": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Dimensions",
+                        "default": "48x48x48"
+                    },
+                    "freight_class": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Freight Class",
+                        "default": "70"
+                    },
+                    "hazmat": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Hazmat",
+                        "default": false
+                    },
+                    "accessorials": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Accessorials",
+                        "default": ""
+                    },
+                    "pickup_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Pickup Date"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "customer_id",
+                    "origin",
+                    "destination",
+                    "weight_lbs",
+                    "pickup_date"
+                ],
+                "title": "FreightQuoteCreate"
+            },
+            "FreightQuoteResponse": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "title": "Id"
+                    },
+                    "customer_id": {
+                        "type": "integer",
+                        "title": "Customer Id"
+                    },
+                    "customer": {
+                        "$ref": "#/components/schemas/CustomerResponse"
+                    },
+                    "status": {
+                        "type": "string",
+                        "title": "Status"
+                    },
+                    "origin": {
+                        "type": "string",
+                        "title": "Origin"
+                    },
+                    "destination": {
+                        "type": "string",
+                        "title": "Destination"
+                    },
+                    "weight_lbs": {
+                        "type": "number",
+                        "title": "Weight Lbs"
+                    },
+                    "dimensions": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Dimensions"
+                    },
+                    "freight_class": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Freight Class"
+                    },
+                    "hazmat": {
+                        "type": "boolean",
+                        "title": "Hazmat"
+                    },
+                    "accessorials": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Accessorials"
+                    },
+                    "pickup_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Pickup Date"
+                    },
+                    "first_round_ends_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "First Round Ends At"
+                    },
+                    "rebid_round_ends_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Rebid Round Ends At"
+                    },
+                    "quote_expires_at": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "date-time"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Quote Expires At"
+                    },
+                    "cost_price": {
+                        "type": "number",
+                        "title": "Cost Price"
+                    },
+                    "sell_price": {
+                        "type": "number",
+                        "title": "Sell Price"
+                    },
+                    "markup_percent": {
+                        "type": "number",
+                        "title": "Markup Percent"
+                    },
+                    "margin_amt": {
+                        "type": "number",
+                        "title": "Margin Amt"
+                    },
+                    "margin_pct": {
+                        "type": "number",
+                        "title": "Margin Pct"
+                    },
+                    "winning_carrier_id": {
+                        "anyOf": [
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Winning Carrier Id"
+                    },
+                    "winning_carrier": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/CarrierResponse"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "lost_reason": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Lost Reason"
+                    },
+                    "competitor_info": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Competitor Info"
+                    },
+                    "payment_status": {
+                        "type": "string",
+                        "title": "Payment Status"
+                    },
+                    "bol_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Bol Url"
+                    },
+                    "invoice_url": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Invoice Url"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Updated At"
+                    },
+                    "bids": {
+                        "items": {
+                            "$ref": "#/components/schemas/CarrierBidResponse"
+                        },
+                        "type": "array",
+                        "title": "Bids",
+                        "default": []
+                    },
+                    "transitions": {
+                        "items": {
+                            "$ref": "#/components/schemas/StateTransitionResponse"
+                        },
+                        "type": "array",
+                        "title": "Transitions",
+                        "default": []
+                    },
+                    "rfqs": {
+                        "items": {
+                            "$ref": "#/components/schemas/RequestForQuoteResponse"
+                        },
+                        "type": "array",
+                        "title": "Rfqs",
+                        "default": []
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "customer_id",
+                    "customer",
+                    "status",
+                    "origin",
+                    "destination",
+                    "weight_lbs",
+                    "dimensions",
+                    "freight_class",
+                    "hazmat",
+                    "accessorials",
+                    "pickup_date",
+                    "first_round_ends_at",
+                    "rebid_round_ends_at",
+                    "quote_expires_at",
+                    "cost_price",
+                    "sell_price",
+                    "markup_percent",
+                    "margin_amt",
+                    "margin_pct",
+                    "winning_carrier_id",
+                    "winning_carrier",
+                    "lost_reason",
+                    "competitor_info",
+                    "payment_status",
+                    "bol_url",
+                    "invoice_url",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "FreightQuoteResponse"
+            },
+            "GoogleSSORequest": {
+                "properties": {
+                    "credential": {
+                        "type": "string",
+                        "title": "Credential"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "credential"
+                ],
+                "title": "GoogleSSORequest"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "QuoteApprovalRequest": {
+                "properties": {
+                    "approved": {
+                        "type": "boolean",
+                        "title": "Approved"
+                    },
+                    "lost_reason": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Lost Reason"
+                    },
+                    "competitor_info": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Competitor Info"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "approved"
+                ],
+                "title": "QuoteApprovalRequest"
+            },
+            "RequestForQuoteResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "freight_quote_id": {
+                        "type": "string",
+                        "title": "Freight Quote Id"
+                    },
+                    "carrier_id": {
+                        "type": "integer",
+                        "title": "Carrier Id"
+                    },
+                    "supplier_id": {
+                        "type": "integer",
+                        "title": "Supplier Id"
+                    },
+                    "status": {
+                        "type": "string",
+                        "title": "Status"
+                    },
+                    "sent_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Sent At"
+                    },
+                    "subject": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Subject"
+                    },
+                    "body": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Body"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "freight_quote_id",
+                    "carrier_id",
+                    "supplier_id",
+                    "status",
+                    "sent_at"
+                ],
+                "title": "RequestForQuoteResponse"
+            },
+            "SimulateEmailRequest": {
+                "properties": {
+                    "sender": {
+                        "type": "string",
+                        "title": "Sender"
+                    },
+                    "recipient": {
+                        "type": "string",
+                        "title": "Recipient"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "title": "Subject"
+                    },
+                    "body": {
+                        "type": "string",
+                        "title": "Body"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "sender",
+                    "recipient",
+                    "subject",
+                    "body"
+                ],
+                "title": "SimulateEmailRequest"
+            },
+            "StateTransitionResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "from_status": {
+                        "type": "string",
+                        "title": "From Status"
+                    },
+                    "to_status": {
+                        "type": "string",
+                        "title": "To Status"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Timestamp"
+                    },
+                    "notes": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Notes"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "from_status",
+                    "to_status",
+                    "timestamp"
+                ],
+                "title": "StateTransitionResponse"
+            },
+            "UserLogin": {
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "title": "UserLogin"
+            },
+            "UserRegister": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "password": {
+                        "type": "string",
+                        "title": "Password"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "name",
+                    "email",
+                    "password"
+                ],
+                "title": "UserRegister"
+            },
+            "UserResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "title": "Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "title": "Name"
+                    },
+                    "email": {
+                        "type": "string",
+                        "title": "Email"
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "title": "Is Active"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "is_active",
+                    "created_at"
+                ],
+                "title": "UserResponse"
+            },
+            "UserTokenResponse": {
+                "properties": {
+                    "access_token": {
+                        "type": "string",
+                        "title": "Access Token"
+                    },
+                    "token_type": {
+                        "type": "string",
+                        "title": "Token Type",
+                        "default": "bearer"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/UserResponse"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "access_token",
+                    "user"
+                ],
+                "title": "UserTokenResponse"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    },
+                    "input": {
+                        "title": "Input"
+                    },
+                    "ctx": {
+                        "type": "object",
+                        "title": "Context"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
