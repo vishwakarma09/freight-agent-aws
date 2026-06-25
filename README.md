@@ -2,7 +2,137 @@
 
 An automated competitive freight bidding API running on AWS Lambda and API Gateway using Python, FastAPI, and Mangum. This application stores and retrieves bidding metadata and quotes as JSON documents in Amazon S3.
 
+## Architecture Diagrams
+
+### 1. AWS Architecture Diagram
+
+```mermaid
+graph TD
+    subgraph Client ["Client Tier"]
+        Browser["React Frontend - Vite"]
+    end
+
+    subgraph AWS ["AWS Cloud Infrastructure"]
+        subgraph StaticHosting ["S3 Web Hosting"]
+            FrontendBucket["S3 Frontend Bucket - freight-agent-frontend-dev-*"]
+        end
+
+        subgraph APIGateway ["API Gateway"]
+            HttpApi["HTTP API Gateway - proxy path"]
+        end
+
+        subgraph Compute ["Serverless Compute"]
+            ApiLambda["FastAPI App Lambda - app.main.handler"]
+            CronLambda["Cron Processor Lambda - app.main.cron_handler"]
+        end
+
+        subgraph EventBridge ["Scheduling"]
+            CronRule["EventBridge Rule - rate 1 minute"]
+        end
+
+        subgraph Storage ["Storage and Database"]
+            Postgres["Amazon RDS PostgreSQL - with pgvector"]
+            PrivateS3["Private S3 Bucket - dispatch-private"]
+        end
+    end
+
+    subgraph External ["External Services"]
+        Cerebras["Cerebras AI API - Llama-3-70B/8B"]
+        EmailServer["Mailpit / SMTP and IMAP Server"]
+        GoogleAuth["Google OAuth 2.0"]
+    end
+
+    %% Interactions
+    Browser -->|Fetches Static Assets| FrontendBucket
+    Browser -->|API Requests| HttpApi
+    HttpApi -->|Invokes| ApiLambda
+
+    CronRule -->|Triggers Every Minute| CronLambda
+
+    %% Lambda Operations
+    ApiLambda -->|SQL Queries and pgvector RAG| Postgres
+    ApiLambda -->|Read/Write Attachments| PrivateS3
+    ApiLambda -->|Google SSO / Authentication| GoogleAuth
+
+    CronLambda -->|Read/Write Bids and Quotes| Postgres
+    CronLambda -->|Check Workflow Timers| Postgres
+    CronLambda -->|Poll IMAP and Send SMTP| EmailServer
+    CronLambda -->|LLM Parse and Extract Bids| Cerebras
+    
+    %% Shared DB access
+    ApiLambda -.->|Internal Service Calls| Cerebras
+```
+
+### 2. Application Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph Frontend ["Frontend UI - React/Vite"]
+        UI["React Pages and State"]
+        APIClient["API Client - Axios"]
+        UI --> APIClient
+    end
+
+    subgraph Backend ["FastAPI Backend Application"]
+        subgraph Routers ["FastAPI APIRouter Endpoints"]
+            AuthRoute["auth.py - User Auth and OAuth"]
+            QuotesRoute["quotes.py - Quote Management"]
+            CarriersRoute["carriers.py - Carrier Management"]
+            CustomersRoute["customers.py - Customer Management"]
+            SimRoute["simulator.py - Round Simulation"]
+            AnalyticsRoute["analytics.py - Metrics and Charts"]
+            CredsRoute["email_credentials.py - SMTP settings"]
+        end
+
+        subgraph CoreServices ["Business Logic and Services"]
+            Workflow["workflow.py - State Machine and Timers"]
+            EmailSvc["email_service.py - SMTP and IMAP Engine"]
+            AISvc["cerebras_service.py - Llama-3 Parsing and Extraction"]
+            EmbedSvc["embedding_service.py - pgvector Embeddings"]
+            BillingSvc["billing.py - Invoice and BOL Generation"]
+            S3Storage["s3_storage.py - S3 Attachment Helper"]
+        end
+
+        subgraph DataAccess ["Database and ORM"]
+            Models["models.py - SQLAlchemy Models"]
+            Schemas["schemas.py - Pydantic Validation"]
+            DBConnection["database.py - Database Connections"]
+        end
+    end
+
+    subgraph Database ["PostgreSQL Database"]
+        PGVector["pgvector Extension"]
+        Tables["Relational Tables"]
+    end
+
+    %% Flow connections
+    APIClient --> Routers
+    
+    %% Router connections to Services & Database
+    QuotesRoute --> Workflow
+    QuotesRoute --> EmbedSvc
+    CredsRoute --> DBConnection
+    AuthRoute --> DBConnection
+    
+    %% Services orchestration
+    Workflow --> EmailSvc
+    Workflow --> BillingSvc
+    Workflow --> S3Storage
+    
+    EmailSvc --> AISvc
+    EmailSvc --> S3Storage
+    EmailSvc --> Workflow
+    
+    %% Data / Database Connections
+    Workflow --> Models
+    EmailSvc --> Models
+    Models --> DBConnection
+    DBConnection --> Tables
+    EmbedSvc -.-> PGVector
+```
+
 ---
+
 
 ## Prerequisites
 
