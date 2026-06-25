@@ -32,10 +32,13 @@ def send_email(to_email: str, subject: str, body_html: str, from_email: str = No
     
     try:
         # Connect to SMTP
-        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
-        # If TLS is enabled, start TLS
-        if settings.SMTP_TLS or settings.SMTP_PORT == 587:
-            server.starttls()
+        if settings.SMTP_PORT == 465:
+            server = smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10.0)
+        else:
+            server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10.0)
+            # If TLS is enabled, start TLS
+            if settings.SMTP_TLS or settings.SMTP_PORT == 587:
+                server.starttls()
         # If username/password is configured, login (like in production)
         if settings.SMTP_USER and settings.SMTP_PASSWORD:
             server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
